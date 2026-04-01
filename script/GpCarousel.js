@@ -64,6 +64,7 @@ class GpCarousel extends HTMLElement {
                     width: 100%;
                     height: 100%;
                     flex-shrink: 0;
+                    word-break: break-word;
                 }
                 .prev,
                 .next {
@@ -233,6 +234,7 @@ class GpCarousel extends HTMLElement {
         if (this.autoPlay!=="off") {
             this._startAutoPlay();
         }
+        this._setSwipe();
     }
     async _clickFocusBtn(e) {
         if (this.isAnimating) return;
@@ -334,6 +336,69 @@ class GpCarousel extends HTMLElement {
             btns[i].style.background = "gray";
         }
         btns[index].style.background = "#3E7A38";
+    }
+    _setSwipe() {
+        const carousel = this.shadowRoot.getElementById("carousel");
+        let startX = 0;
+        let isDragging = false;
+
+        carousel.addEventListener("touchstart", (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            this._stopAutoPlay();
+        });
+        carousel.addEventListener("touchend", async (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const endX = e.changedTouches[0].clientX;
+            await this._handleSwipe(endX - startX);
+        });
+        carousel.addEventListener("pointerdown", (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            this._stopAutoPlay();
+        });
+        document.addEventListener("pointerup", async (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const endX = e.clientX;
+            await this._handleSwipe(endX - startX);
+        });
+        carousel.addEventListener("mouseleave", () => {
+            isDragging = false;
+        });
+        carousel.addEventListener("dragstart", (e) => {
+            e.preventDefault();
+        });
+    }
+    async _handleSwipe(diff) {
+        if (this.isAnimating) return;
+        this.isAnimating = true;
+
+        const threshold = 25;
+
+        if (Math.abs(diff) < threshold) {
+            this.isAnimating = false;
+            return;
+        }
+
+        if (diff > 0) {
+            let index = this.currentIndex - 1;
+            if (index < 0) index = this.list - 1;
+            this.currentIndex = index;
+            this._setPointer(index);
+            await this._move("left");
+        } else {
+            let index = this.currentIndex + 1;
+            if (index >= this.list) index = 0;
+            this.currentIndex = index;
+            this._setPointer(index);
+            await this._move();
+        }
+        this.isAnimating = false;
+        this._startAutoPlay();
     }
 }
 

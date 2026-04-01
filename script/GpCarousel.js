@@ -357,18 +357,3 @@ customElements.define("g-p-carousel", GpCarousel);
 //     <div slot="item-2">2</div>
 //     <div slot="item-3">3</div>
 // </g-p-carousel>
-// <g-p-carousel
-// interval="5000"
-// autoPlay="off"
-// list="3"
-// slideButton="on"
-// controller="off"
-// aspect-ratio="5 / 2"
-// border="2px solid blue"
-// borderRadius="none"
-// background="pink"
-// >
-// <div slot="item-1">1</div>
-// <div slot="item-2">2</div>
-// <div slot="item-3">3</div>
-// </g-p-carousel>

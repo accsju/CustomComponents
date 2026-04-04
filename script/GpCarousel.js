@@ -6,9 +6,9 @@ class GpCarousel extends HTMLElement {
     currentIndex = 0;
     isAnimating = false;
     autoPlayTimer = null;
+    autoPlayFlag = null
     AUTO_PLAY_INTERVAL = 3000;
-    autoPlay = "on";
-
+    autoPlay = "on";             
     list = 5;
     slideButton = "on"
     controller = "on"
@@ -17,10 +17,10 @@ class GpCarousel extends HTMLElement {
     borderRadius = "none";
     background = "white";
     connectedCallback() {
-        this.AUTO_PLAY_INTERVAL = this.getAttribute("interval") ?? this.AUTO_PLAY_INTERVAL
+        this.AUTO_PLAY_INTERVAL = Number(this.getAttribute("interval")) ?? this.AUTO_PLAY_INTERVAL
         this.autoPlay = this.getAttribute("autoPlay") ?? this.autoPlay;               
-
-        this.list = this.getAttribute("list") ?? this.list;                 
+        this.autoPlayFlag = this.autoPlay === "on" ? true : false; 
+        this.list = Number(this.getAttribute("list")) ?? this.list;                 
         this.slideButton = this.getAttribute("slideButton") ?? this.slideButton;
         this.controller = this.getAttribute("controller") ?? this.controller;            
 
@@ -181,13 +181,19 @@ class GpCarousel extends HTMLElement {
         carousel.style.border = this.border;
         carousel.style.borderRadius = this.borderRadius;
         carousel.style.background = this.background;
-        playBtn.classList.add("play");
+        if (this.autoPlayFlag) {
+            playBtn.classList.add("play");
+        } else {
+            playBtn.classList.add("pause");
+        }
         playBtn.addEventListener("click", () => {
-            if (this.autoPlayTimer) {
+            if (this.autoPlayFlag) {
+                this.autoPlayFlag = false;  
                 this._stopAutoPlay();
                 playBtn.classList.remove("play");
                 playBtn.classList.add("pause"); 
             } else {
+                this.autoPlayFlag = true;
                 this._startAutoPlay();
                 playBtn.classList.remove("pause");
                 playBtn.classList.add("play");
@@ -240,24 +246,19 @@ class GpCarousel extends HTMLElement {
         if (this.isAnimating) return;
         this._stopAutoPlay();
         this.isAnimating = true;
-        let choiceIndex = e.currentTarget.dataset.index;
-        let diff = this.currentIndex - choiceIndex;
-        let sign = Math.sign(diff);
-        diff = Math.abs(diff);
+        const choiceIndex = Number(e.currentTarget.dataset.index);
+        const diff = choiceIndex - this.currentIndex;
+        const steps = Math.abs(diff);
         this.currentIndex = choiceIndex;
         this._setPointer(choiceIndex);
-        if (diff===0) {
-
-        } else if (sign===1) {
-            for (let i=0;i<diff;i++) {
-                await this._move("left");
+        if (steps > 0) {
+            const direction = diff < 0 ? "left" : "right";
+            for (let i = 0; i < steps; i++) {
+                await this._move(direction);
             }
-            this._startAutoPlay();
-        } else if (sign===-1) {
-            for (let i=0;i<diff;i++) {
-                await this._move();
+            if (this.autoPlayFlag) {
+                this._startAutoPlay();
             }
-            this._startAutoPlay();
         }
         this.isAnimating = false;
     }
@@ -341,7 +342,6 @@ class GpCarousel extends HTMLElement {
         const carousel = this.shadowRoot.getElementById("carousel");
         let startX = 0;
         let isDragging = false;
-
         carousel.addEventListener("touchstart", (e) => {
             startX = e.touches[0].clientX;
             isDragging = true;
@@ -376,9 +376,7 @@ class GpCarousel extends HTMLElement {
     async _handleSwipe(diff) {
         if (this.isAnimating) return;
         this.isAnimating = true;
-
         const threshold = 25;
-
         if (Math.abs(diff) < threshold) {
             this.isAnimating = false;
             return;
@@ -391,14 +389,16 @@ class GpCarousel extends HTMLElement {
             this._setPointer(index);
             await this._move("left");
         } else {
-            let index = this.currentIndex + 1;
+            let index = this.currentIndex + 1;  
             if (index >= this.list) index = 0;
             this.currentIndex = index;
             this._setPointer(index);
             await this._move();
         }
         this.isAnimating = false;
-        this._startAutoPlay();
+        if (this.autoPlay!=="off") {
+            this._startAutoPlay();
+        } 
     }
 }
 

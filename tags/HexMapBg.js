@@ -4,7 +4,6 @@ class HexMapBg extends HTMLElement {
         this.attachShadow({ mode: "open" });
     }
     autoPlay = "on";
-    mapState = null;
     connectedCallback() {
         const autoPlay = this.getAttribute("autoPlay") ?? this.autoPlay;
         this._render();
@@ -33,6 +32,7 @@ class HexMapBg extends HTMLElement {
                     height: 100%;
                     background: #0D1425;
                     z-index: 1;    
+                    overflow: hidden;
                 }
                 .background::before {
                     content: "";
@@ -44,12 +44,16 @@ class HexMapBg extends HTMLElement {
                     transform: translate(-50%, -50%);
                     background: orange;
                     border-radius: 50%;
-                    filter: blur(110px);   
+                    filter: blur(210px);   
                     opacity: .3;               
                 }
                 path {
+                    fill: transparent;
                     transition: fill 0.6s ease, opacity 0.6s ease;
-                }
+                }   
+                path.active {
+                    fill: orange;
+                }         
                 .content {
                     position: relative;
                     z-index: 2; 
@@ -82,7 +86,8 @@ class HexMapBg extends HTMLElement {
         const a = 30;
 
         const w = Math.floor(width / (a*(3/2))) + 1;
-        const h = Math.floor(height / (a*2)) + 1;
+        const h = Math.floor(height / (2*(a/Math.sqrt(3)))) + 1;
+        console.log(h)
 
         background.style.height = `${height}px`;
         svg.innerHTML = "";                     
@@ -111,7 +116,6 @@ class HexMapBg extends HTMLElement {
             initX = 0;
             initY = 2*i*Math.sqrt(3)*a/2;
         }
-        this.mapState = mapState;
         for (let i=0;i<w*h;i++) {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("d", mapState[i].d);
@@ -130,12 +134,11 @@ class HexMapBg extends HTMLElement {
             paths.forEach((p, i) => {
                 const wave = Math.sin(i * 0.3 + t);
                 if (wave > 0.8) {
-                    p.setAttribute("fill", "orange");
+                    p.classList.add("active");
                 } else {
-                    p.setAttribute("fill", "transparent");
+                    p.classList.remove("active");
                 }
             });
-
             t += 0.1;
             requestAnimationFrame(animate);
         };
@@ -144,4 +147,19 @@ class HexMapBg extends HTMLElement {
 }
 
 customElements.define("hex-map-bg", HexMapBg);
+
+// <hex-map-bg
+//     autoPlay="on"
+// >
+//     <div slot="content">
+//         <div style="padding: 10px">
+//             <h1 style="color: white;">HelloWorld.</h1>
+//             <p style="color: #90A1B9;">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+//             <div style="display: flex; margin: 10px 0 0 0;">
+//                 <button style="background: orange; color: white; border: none; padding: 10px; margin: 0 10px 0 0; border-radius: 5px;">Get Started -></button>
+//                 <button style="color: #90A1B9; border: 1px solid #90A1B9; padding: 10px; background: transparent; border-radius: 5px;">View on GitHub</button>
+//             </div>
+//         </div>
+//     </div>       
+// </hex-map-bg>
 

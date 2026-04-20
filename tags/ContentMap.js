@@ -95,17 +95,10 @@ class ContentMap extends HTMLElement {
                     margin-left: auto;
                     margin-right: auto;
                 }
-                .contents { 
-                    position: relative;
-                }
                 .content-wrap {
-                    position: absolute; 
-                    width: 100%;
-                    height: 100%;
                     display: none;
                 }   
                 .content-wrap.active {
-                    position: relative;
                     display: block;
                 }          
                 @media screen and (max-width: 450px) {
@@ -115,6 +108,9 @@ class ContentMap extends HTMLElement {
                     }
                     .line {
                         height: 15px;
+                    }
+                    .content-wrap {
+                        margin: 10px 0 0 0;
                     }
                 }
             </style>
@@ -160,10 +156,10 @@ class ContentMap extends HTMLElement {
             contentAll += content(i, defaultIndex);
         }
         let body = `
-            <div class="chronology"> 
+            <div> 
                 ${titleAll}      
             </div>
-            <div class="contents">
+            <div>
                 ${contentAll}
             </div>
         `;

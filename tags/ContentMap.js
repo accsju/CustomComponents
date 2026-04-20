@@ -11,7 +11,7 @@ class ContentMap extends HTMLElement {
         this.list = Number(this.getAttribute("list")) ?? this.list;
         this.bg = this.getAttribute("bg") ?? this.bg; 
         this.color = this.getAttribute("color") ?? this.color;
-        this.defaultIndex = this.getAttribute("defaultIndex") ?? this.defaultIndex;
+        this.defaultIndex = Number(this.getAttribute("defaultIndex")) ?? this.defaultIndex;
         this._render();
     }
     _render() {

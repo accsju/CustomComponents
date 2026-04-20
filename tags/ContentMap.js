@@ -28,8 +28,6 @@ class ContentMap extends HTMLElement {
                     color: white;
                     padding: 10px 0;
                 }
-                .chronology {
-                }                
                 .titles,
                 .line-block {
                     display: grid;
@@ -46,15 +44,16 @@ class ContentMap extends HTMLElement {
                     margin-right: auto;
                 }
                 .title-wrap {
-                    background: transparents;
+                    background: transparent;
                     border-radius: 5px;
                     padding: 5px 10px;
                     text-align: center;         
-                    border: 2px solid ${color};          
+                    border: 2px solid white;          
                     position: relative;
                 }  
                 .title-wrap.active {
-                    background: ${color};
+                    border: 2px solid #00FF9C;
+                    box-shadow: 0 0 10px #00FF9C;
                 }
                 .point.active {
                     border: 2px solid ${color};                 
@@ -65,7 +64,7 @@ class ContentMap extends HTMLElement {
                 .line {
                     width: 2px;
                     height: 30px;
-                    background: ${color};
+                    background: white;
                     margin-left: auto;
                     margin-right: auto;
                     position: relative;
@@ -74,7 +73,7 @@ class ContentMap extends HTMLElement {
                     content: "";
                     width: 2px;
                     height: 10px;
-                    background: ${color};
+                    background: white;
                     display: block;
                     position: absolute;
                     top: -10px;
@@ -83,7 +82,7 @@ class ContentMap extends HTMLElement {
                     content: "";
                     width: 2px;
                     height: 10px;
-                    background: ${color};
+                    background: white;
                     display: block;
                     position: absolute;
                     bottom: -10px;
@@ -106,8 +105,18 @@ class ContentMap extends HTMLElement {
                     display: none;
                 }   
                 .content-wrap.active {
+                    position: relative;
                     display: block;
                 }          
+                @media screen and (max-width: 450px) {
+                    #root {
+                        display: grid;
+                        grid-template-columns: 1fr;
+                    }
+                    .line {
+                        height: 15px;
+                    }
+                }
             </style>
             <div id="root">
             </div>
